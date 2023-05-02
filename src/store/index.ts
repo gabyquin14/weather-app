@@ -6,4 +6,5 @@ export default createStore({
   mutations: {},
   actions: {},
   modules: {},
+  // plugins: process.env.NODE_ENV === "development" ? [] : [],
 });
