@@ -1,37 +1,21 @@
 <template>
   <section class="weather-report">
-    <WeatherMainCard v-if="info && info.list" :info="info" />
+    <WeatherMainCard
+      v-if="weatherStore.weatherInfo && weatherStore.weatherInfo?.list"
+    />
     <WeatherDetails />
   </section>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
-import axios from "axios";
+<script setup lang="ts">
+import { onMounted } from "vue";
 import WeatherMainCard from "./WeatherMainCard.vue";
 import WeatherDetails from "./WeatherDetails.vue";
-import { DayWeather } from "@/store/type";
+import { useWeatherStore } from "../store/weather";
 
-export default defineComponent({
-  name: "WeatherReport",
-  components: { WeatherMainCard, WeatherDetails },
-  setup() {
-    const info = ref<DayWeather>();
-    onMounted(async () => {
-      try {
-        const city = "maracaibo";
-        const key = "fa4c72d59e16a260f9e168838ebe21bd";
-        const response = await axios.get(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=6&appid=${key}`
-        );
-
-        info.value = response.data;
-      } catch (error) {
-        console.log(error);
-      }
-    });
-    return { info };
-  },
+const weatherStore = useWeatherStore();
+onMounted(async () => {
+  await weatherStore.setWeatherInfo();
 });
 </script>
 
@@ -39,19 +23,32 @@ export default defineComponent({
 .weather-report {
   border-radius: 2rem;
   color: var(--main-text);
-  height: 90vh;
-  max-height: 90vh;
+  height: 100%;
   width: 80%;
+  margin: 6rem 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: -10px 21px 37px 7px rgba(219, 219, 219, 1);
 }
 @media screen and (min-width: 900px) {
   .weather-report {
+    height: 100%;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .weather-report {
     flex-direction: row;
+    height: 90vh;
+    max-height: 90vh;
+    margin: 0;
+  }
+}
+@media screen and (min-width: 1600px) {
+  .weather-report {
+    height: 80vh;
+    max-height: 80vh;
   }
 }
 </style>

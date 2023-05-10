@@ -3,82 +3,103 @@
     <div class="city-input">
       <div>
         <BiSearch />
-        <input type="text" placeholder="Search a city..." />
+        <input
+          type="text"
+          placeholder="Search a city..."
+          v-model="city"
+          @keydown.enter.stop="fetchWeatherInfo"
+        />
       </div>
 
       <BiX style="margin-left: auto" />
     </div>
     <img
-      src="../assets/animated/cloudy-day-1.svg"
+      :src="returnImage(storeShortcut?.weather[0].icon as keyof typeof imageCodes)"
       alt="weather-icon"
       class="weather-img"
     />
 
     <div class="main-card-content">
-      <h2 class="main-card-degrees">12<span>°C</span></h2>
-      <p class="main-card-date">Monday, <span>16:00</span></p>
+      <h2 class="main-card-degrees">
+        {{ weatherStore.getTemp(storeShortcut?.main.temp as number) }}
+        <span>{{ weatherStore.metric === "metric" ? "°C" : "°F" }}</span>
+      </h2>
+      <p class="main-card-date">
+        {{ day }}, <span>{{ hours }}:{{ minutes }}</span>
+      </p>
 
       <div class="separator" />
 
       <div class="main-card-stats">
-        <img src="../assets/animated/cloudy.svg" alt="" class="city-stats" />
-        <h4>Mostly cloudy</h4>
+        <img :src="returnImage('03d')" alt="" class="city-stats" />
+        <h4>{{ storeShortcut?.weather[0].description }}</h4>
       </div>
 
       <div class="main-card-stats">
-        <img src="../assets/animated/rainy-4.svg" alt="" class="city-stats" />
-        <h4>Rain 30%</h4>
+        <img :src="returnImage('09d')" alt="" class="city-stats" />
+        <h4>
+          Rain in last 3h:
+          {{ storeShortcut?.rain ? `${storeShortcut.rain["3h"]}%` : "None" }}
+        </h4>
       </div>
 
       <div class="city-img-container">
         <div class="city-img-overlay" />
-        <span class="city-image-title">Maracaibo, VE</span>
+        <span class="city-image-title"
+          >{{ weatherStore.weatherInfo?.city.name }},
+          {{ weatherStore.weatherInfo?.city.country }}</span
+        >
         <img :src="cityPhoto" alt="" class="city-img" />
       </div>
     </div>
   </section>
 </template>
 
-<script lang="ts">
-import { onMounted, defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { onMounted, ref, computed } from "vue";
 import axios from "axios";
 import { BiSearch, BiX } from "vue3-icons/bi";
+import { useWeatherStore } from "../store/weather";
+import { returnImage, imageCodes } from "@/helpers/index";
 
-export default defineComponent({
-  name: "WeatherMainCard",
-  components: { BiSearch, BiX },
-  props: {
-    info: {
-      type: Object,
-      required: true,
-    },
-  },
-  setup(props) {
-    const cityPhoto = ref("");
-    onMounted(async () => {
-      try {
-        const response = await axios.get(
-          `https://api.teleport.org/api/urban_areas/slug:caracas/images/`
-        );
+const city = ref("caracas");
+const cityPhoto = ref("");
+const weatherStore = useWeatherStore();
+const [day, hours, minutes] = weatherStore.convertDate() ?? ["", "", ""];
+const storeShortcut = computed(() => weatherStore.weatherInfo?.list[0]);
 
-        cityPhoto.value = response.data.photos[0].image.mobile;
-      } catch (error) {
-        console.log(error);
-      }
-    });
-    return { cityPhoto };
-  },
+const fetchImage = async () => {
+  try {
+    const response = await axios.get(
+      `https://api.teleport.org/api/urban_areas/slug:${city.value}/images/`
+    );
+    cityPhoto.value = response.data.photos[0].image.mobile;
+  } catch (error) {
+    const response = await axios.get(
+      `https://api.teleport.org/api/urban_areas/slug:caracas/images/`
+    );
+    cityPhoto.value = response.data.photos[0].image.mobile;
+    console.log(error);
+  }
+};
+const fetchWeatherInfo = async () => {
+  await weatherStore.setWeatherInfo(city.value);
+  await fetchImage();
+};
+
+onMounted(async () => {
+  fetchImage();
 });
 </script>
 
 <style scoped>
 .main-card {
   background-color: white;
-  border-radius: 2rem 2rem 0 0;
   display: flex;
   flex-direction: column;
-  width: 80%;
+  width: 100%;
   height: 100%;
+  min-height: 100vh;
   box-sizing: border-box;
   padding: 2rem;
   position: relative;
@@ -111,14 +132,14 @@ export default defineComponent({
 }
 .weather-img {
   position: absolute;
-  top: 2rem;
+  top: 2%;
   right: -6rem;
-  width: 35rem;
+  width: 30rem;
   height: auto;
   pointer-events: none;
 }
 .main-card-degrees {
-  font-size: 6rem;
+  font-size: 5rem;
   display: flex;
   font-weight: 400;
 }
@@ -128,6 +149,7 @@ export default defineComponent({
 }
 .main-card-date {
   font-size: 2rem;
+  text-transform: capitalize;
 }
 .main-card-date span {
   color: var(--dark-gray);
@@ -152,6 +174,7 @@ export default defineComponent({
 .main-card-stats h4 {
   font-size: 1.8rem;
   font-weight: 400;
+  text-transform: capitalize;
 }
 /*MAIN CARD CONTENT */
 .main-card-content {
@@ -190,11 +213,37 @@ export default defineComponent({
   font-size: 2rem;
   font-weight: bold;
 }
-@media screen and (min-width: 900px) {
+
+@media screen and (min-width: 700px) {
+  .main-card {
+    height: 100%;
+    min-height: calc(100vh - 40rem);
+    border-radius: 1rem 1rem 0 0;
+    padding: 2rem 4rem 4rem;
+  }
+}
+
+@media screen and (min-height: 600px) {
+  .weather-img {
+    top: 4%;
+    right: -2rem;
+    width: 32rem;
+  }
+}
+
+@media screen and (min-height: 900px) {
+  .weather-img {
+    top: 4%;
+    right: -6rem;
+    width: 40rem;
+  }
+}
+@media screen and (min-width: 1200px) {
   .main-card {
     min-width: 40rem;
     max-width: 40rem;
     width: 30%;
+    min-height: 100%;
     padding: 4rem;
     border-radius: 2rem 0 0 2rem;
   }

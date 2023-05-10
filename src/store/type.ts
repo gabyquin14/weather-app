@@ -3,7 +3,7 @@ export interface DayWeather {
   message: string | number;
   cntA: number;
   list: ListType[];
-  city: CityType[];
+  city: CityType;
 }
 
 export interface ListType {

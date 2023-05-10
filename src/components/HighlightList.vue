@@ -2,17 +2,21 @@
   <div class="highlight-list">
     <HighlightCard>
       <h3 class="highlight-main-title">Wind status</h3>
-      <h1 class="big-title">7.70<span>km/h</span></h1>
+      <h1 class="big-title">
+        {{ returnWindSpeed() }}<span>{{ metrics ? "km/h" : "mi/h" }}</span>
+      </h1>
       <div class="bottom-description">
         <span class="wind-icon-container"><FaMapMarkerAlt /></span>
-        <span class="description">WSW</span>
+        <span class="description">{{ degToCompass() }}</span>
       </div>
     </HighlightCard>
     <HighlightCard>
       <h3 class="highlight-main-title">Humidity</h3>
-      <h1 class="big-title">12<span>%</span></h1>
+      <h1 class="big-title">
+        {{ storeShortcut?.main.humidity }}<span>%</span>
+      </h1>
       <div class="bottom-description">
-        <span class="description">Normal 👍🏼</span>
+        <span class="description">{{ humidityCaption() }}</span>
       </div>
     </HighlightCard>
     <HighlightCard>
@@ -24,7 +28,7 @@
               <AiOutlineArrowUp />
             </div>
           </div>
-          <h1>06:20AM</h1>
+          <h1>{{ returnDate("sunrise") }}</h1>
         </div>
         <div class="sun-content">
           <div class="outer-circle flex-center">
@@ -32,52 +36,141 @@
               <AiOutlineArrowDown />
             </div>
           </div>
-          <h1>07:20PM</h1>
+          <h1>{{ returnDate("sunset") }}</h1>
         </div>
       </div>
     </HighlightCard>
 
     <HighlightCard>
       <h3 class="highlight-main-title">Cloudness</h3>
-      <h1 class="big-title">7<span>%</span></h1>
+      <h1 class="big-title">{{ storeShortcut?.clouds.all }}<span>%</span></h1>
       <div class="bottom-description">
-        <span class="description">Not too cloudy ☁️</span>
+        <span class="description">{{ cloudyCaption() }} ☁️</span>
       </div>
     </HighlightCard>
     <HighlightCard>
       <h3 class="highlight-main-title">Visibility</h3>
-      <h1 class="big-title">5.2<span>km</span></h1>
+      <h1 class="big-title">
+        {{ returnVisibility() }}<span>{{ metrics ? "km" : "miles" }}</span>
+      </h1>
       <div class="bottom-description">
-        <span class="description">Average 👀</span>
+        <span class="description">{{ visibilityCaption() }}👀</span>
       </div>
     </HighlightCard>
     <HighlightCard>
       <h3 class="highlight-main-title">Pressure</h3>
-      <h1 class="big-title">109.52<span>hpa</span></h1>
+      <h1 class="big-title">
+        {{ storeShortcut?.main.pressure }}<span>hPa</span>
+      </h1>
       <div class="bottom-description">
-        <span class="description">Sea level: 108🍃</span>
+        <span class="description"
+          >Ground level: {{ storeShortcut?.main.grnd_level }}hPa🍃</span
+        >
       </div>
     </HighlightCard>
   </div>
 </template>
-<script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
 import HighlightCard from "./HighlightCard.vue";
 import { FaMapMarkerAlt } from "vue3-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "vue3-icons/ai";
-export default defineComponent({
-  name: "HighlightList",
-  components: {
-    HighlightCard,
-    FaMapMarkerAlt,
-    AiOutlineArrowDown,
-    AiOutlineArrowUp,
-  },
-});
+import { useWeatherStore } from "../store/weather";
+import { CityType } from "@/store/type";
+
+const weatherStore = useWeatherStore();
+const metrics = computed(() => weatherStore.metric === "metric");
+const storeShortcut = computed(() => weatherStore.weatherInfo?.list[0]);
+
+const degToCompass = () => {
+  var deg = Math.floor((storeShortcut.value?.wind?.deg as number) / 22.5 + 0.5);
+  var directions = [
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "E",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSW",
+    "SW",
+    "WSW",
+    "W",
+    "WNW",
+    "NW",
+    "NNW",
+  ];
+  return directions[deg % 16];
+};
+
+const returnWindSpeed = () => {
+  if (storeShortcut.value) {
+    return metrics.value
+      ? ((storeShortcut.value.wind.speed * 3600) / 1000).toFixed(2)
+      : (storeShortcut.value.wind.speed * 2.2369).toFixed(2);
+  }
+};
+
+const returnDate = (type: keyof CityType): string => {
+  const unixSeconds = Number(weatherStore?.weatherInfo?.city?.[type]);
+  const timezone = Number(weatherStore?.weatherInfo?.city?.timezone);
+  const date = new Date((unixSeconds + timezone * 60) * 1000);
+  const hours = `0${
+    date.getHours() % (metrics.value ? 12 : 24) || (metrics.value ? 12 : 0)
+  }`.slice(-2);
+  const minutes = `0${date.getMinutes()}`.slice(-2);
+  const ampm = metrics.value ? (date.getHours() >= 12 ? "PM" : "AM") : "";
+  return `${hours}:${minutes} ${ampm}`;
+};
+
+const returnVisibility = () => {
+  if (metrics.value) {
+    return ((storeShortcut.value?.visibility as number) / 1000).toFixed(1);
+  } else {
+    return ((storeShortcut.value?.visibility as number) / 1609).toFixed(1);
+  }
+};
+
+const humidityCaption = () => {
+  if (storeShortcut?.value) {
+    if (storeShortcut?.value?.main.humidity <= 55) {
+      return "Dry and comfortable";
+    } else if (storeShortcut?.value?.main.humidity <= 65) {
+      return "Sticky and muggy";
+    } else {
+      return "Lots of moisture";
+    }
+  }
+};
+const cloudyCaption = () => {
+  if (storeShortcut?.value) {
+    if (storeShortcut?.value?.clouds.all <= 50) {
+      return "Not too cloudy";
+    } else if (storeShortcut?.value?.main.humidity <= 65) {
+      return "Cloudy";
+    } else {
+      return "Mostly cloudy";
+    }
+  }
+};
+const visibilityCaption = () => {
+  if (storeShortcut?.value) {
+    if (storeShortcut?.value?.visibility <= 1000) {
+      return "Poor visibility";
+    } else if (storeShortcut?.value?.visibility <= 6000) {
+      return "Average";
+    } else {
+      return "Great visibility";
+    }
+  }
+};
 </script>
 <style scoped>
 .highlight-list {
   display: grid;
+  justify-items: center;
   grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
   grid-gap: 2rem;
 }

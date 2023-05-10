@@ -3,23 +3,20 @@
     <slot></slot>
   </section>
 </template>
-
-<script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
-export default defineComponent({
-  name: "HighlightCard",
-});
-</script>
-
 <style scoped>
 .highlight-card {
-  padding: 2rem;
+  padding: 1rem 2rem;
   border-radius: 2rem;
   background-color: white;
-  width: 16rem;
+  width: 80%;
   height: auto;
   display: flex;
   flex-direction: column;
   row-gap: 1rem;
+}
+@media screen and (min-width: 800px) {
+  .highlight-card {
+    width: 16rem;
+  }
 }
 </style>
