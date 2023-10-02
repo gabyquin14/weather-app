@@ -34,7 +34,6 @@ export const useWeatherStore = defineStore("weather", {
       if (this.hasWeatherList) {
         const date = new Date(this.hasWeatherList.dt * 1000);
         const hours = date.getHours().toString().padStart(2, "0");
-        const ampm = parseInt(hours) >= 12 ? "pm" : "am";
         const minutes = date.getMinutes().toString().padStart(2, "0");
         const day = date.toLocaleDateString(undefined, {
           weekday: "long",
