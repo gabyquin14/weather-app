@@ -13,21 +13,24 @@
 
       <BiX style="margin-left: auto" />
     </div>
-    <img
-      :src="returnImage(storeShortcut?.weather[0].icon as keyof typeof imageCodes)"
-      alt="weather-icon"
-      class="weather-img"
-    />
+    <div class="icon-and-date-container">
+      <img
+        :src="returnImage(storeShortcut?.weather[0].icon as keyof typeof imageCodes)"
+        alt="weather-icon"
+        class="weather-img"
+      />
+      <div class="degrees-and-time">
+        <h2 class="degrees-number">
+          {{ weatherStore.getTemp(storeShortcut?.main.temp as number) }}
+          <span>{{ weatherStore.metric === "metric" ? "°C" : "°F" }}</span>
+        </h2>
+        <p class="city-date">
+          {{ day }}, <span>{{ hours }}:{{ minutes }}</span>
+        </p>
+      </div>
+    </div>
 
     <div class="main-card-content">
-      <h2 class="main-card-degrees">
-        {{ weatherStore.getTemp(storeShortcut?.main.temp as number) }}
-        <span>{{ weatherStore.metric === "metric" ? "°C" : "°F" }}</span>
-      </h2>
-      <p class="main-card-date">
-        {{ day }}, <span>{{ hours }}:{{ minutes }}</span>
-      </p>
-
       <div class="separator" />
 
       <div class="main-card-stats">
@@ -98,11 +101,11 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: 60rem;
   height: 100%;
   min-height: 100vh;
   box-sizing: border-box;
   padding: 2rem;
-  position: relative;
 }
 .city-input {
   background-color: #f6f6f8;
@@ -130,28 +133,32 @@ onMounted(async () => {
 .city-input input::placeholder {
   color: var(--main-text);
 }
+.icon-and-date-container {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  margin: auto 0;
+}
 .weather-img {
-  position: absolute;
-  top: 2%;
-  right: -6rem;
-  width: 30rem;
-  height: auto;
+  width: 15rem;
+  height: 15rem;
   pointer-events: none;
 }
-.main-card-degrees {
+.degrees-number {
   font-size: 5rem;
   display: flex;
   font-weight: 400;
 }
-.main-card-degrees span {
+.degrees-number span {
   font-size: 3rem;
   font-weight: 600;
 }
-.main-card-date {
+.city-date {
   font-size: 2rem;
   text-transform: capitalize;
 }
-.main-card-date span {
+.city-date span {
   color: var(--dark-gray);
 }
 .separator {
@@ -176,10 +183,7 @@ onMounted(async () => {
   font-weight: 400;
   text-transform: capitalize;
 }
-/*MAIN CARD CONTENT */
-.main-card-content {
-  margin-top: auto;
-}
+
 /*IMAGE WITH CITY NAME */
 .city-img-container {
   border-radius: 2rem;
@@ -214,38 +218,67 @@ onMounted(async () => {
   font-weight: bold;
 }
 
+@media screen and (min-width: 375px) {
+  .weather-img {
+    width: 20rem;
+    height: 20rem;
+  }
+}
+@media screen and (min-width: 400px) {
+  .weather-img {
+    width: 25rem;
+    height: 25rem;
+  }
+}
+@media screen and (min-width: 600px) {
+  .icon-and-date-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
 @media screen and (min-width: 700px) {
+  /*MAIN CARD CONTENT */
+  .main-card-content {
+    margin-top: auto;
+  }
   .main-card {
     height: 100%;
-    min-height: calc(100vh - 40rem);
+    max-height: 90vh;
     border-radius: 1rem 1rem 0 0;
     padding: 2rem 4rem 4rem;
   }
 }
 
-@media screen and (min-height: 600px) {
-  .weather-img {
-    top: 4%;
-    right: -2rem;
-    width: 32rem;
-  }
-}
-
-@media screen and (min-height: 900px) {
-  .weather-img {
-    top: 4%;
-    right: -6rem;
-    width: 40rem;
-  }
-}
 @media screen and (min-width: 1200px) {
   .main-card {
     min-width: 40rem;
     max-width: 40rem;
+    max-height: 90vh;
+    min-height: unset;
     width: 30%;
-    min-height: 100%;
     padding: 4rem;
     border-radius: 2rem 0 0 2rem;
+  }
+
+  .icon-and-date-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: unset;
+    height: 100%;
+    position: relative;
+  }
+
+  .degrees-and-time {
+    margin-top: auto;
+  }
+
+  .weather-img {
+    position: absolute;
+    right: -5rem;
+    width: 25rem;
+    height: 25rem;
   }
 }
 </style>

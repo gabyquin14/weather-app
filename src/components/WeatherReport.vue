@@ -1,16 +1,16 @@
 <template>
-  <section class="weather-report">
-    <WeatherMainCard
+  <div class="weather-report">
+    <WeatherMainDisplay
       v-if="weatherStore.weatherInfo && weatherStore.weatherInfo?.list"
     />
-    <WeatherDetails />
-  </section>
+    <WeatherSecondaryDetails />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import WeatherMainCard from "./WeatherMainCard.vue";
-import WeatherDetails from "./WeatherDetails.vue";
+import WeatherMainDisplay from "./WeatherMainDisplay.vue";
+import WeatherSecondaryDetails from "./WeatherSecondaryDetails.vue";
 import { useWeatherStore } from "../store/weather";
 
 const weatherStore = useWeatherStore();
@@ -21,20 +21,25 @@ onMounted(async () => {
 
 <style scoped>
 .weather-report {
-  border-radius: 2rem;
   color: var(--main-text);
   height: 100%;
-  width: 80%;
-  margin: 6rem 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-@media screen and (min-width: 900px) {
+@media screen and (min-width: 600px) {
   .weather-report {
+    border-radius: 2rem;
     height: 100%;
+    width: 80%;
+    margin: 2rem 0;
+  }
+}
+@media screen and (min-width: 800px) {
+  .weather-report {
+    margin: 6rem 0;
   }
 }
 @media screen and (min-width: 1200px) {

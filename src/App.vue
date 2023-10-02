@@ -1,20 +1,24 @@
 <template>
-  <div></div>
-  <div class="weather"><WeatherReport /></div>
+  <div><WeatherReport /></div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import WeatherReport from "./components/WeatherReport.vue";
 
-export default defineComponent({
-  name: "App",
-  components: { WeatherReport },
-});
+const successCallback = (position?: any) => {
+  console.log(position);
+};
+
+const errorCallback = (error?: any) => {
+  console.log(error);
+};
+console.log(
+  navigator.geolocation.getCurrentPosition(successCallback, errorCallback)
+);
 </script>
 
 <style scoped>
-.weather {
+div {
   overflow-x: hidden;
   min-height: 100vh;
   width: 100%;

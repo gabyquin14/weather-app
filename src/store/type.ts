@@ -1,3 +1,5 @@
+import { imageCodes } from "@/helpers";
+
 export interface DayWeather {
   cod: string;
   message: string | number;
@@ -24,7 +26,7 @@ export interface ListType {
       id: number;
       main: string;
       description: string;
-      icon: string;
+      icon?: keyof typeof imageCodes;
     }
   ];
   clouds: { all: number };
