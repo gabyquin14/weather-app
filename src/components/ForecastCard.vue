@@ -17,7 +17,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { defineProps, computed } from "vue";
+import { computed } from "vue";
 import { useWeatherStore } from "../store/weather";
 import { returnImage, imageCodes } from "@/helpers/index";
 const weatherStore = useWeatherStore();
