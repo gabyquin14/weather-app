@@ -2,7 +2,7 @@
   <section class="main-card">
     <div class="city-input">
       <div>
-        <BiSearch />
+        <MagnifyingGlassIcon />
         <input
           type="text"
           placeholder="Search a city..."
@@ -11,7 +11,7 @@
         />
       </div>
 
-      <BiX style="margin-left: auto" />
+      <XMarkIcon style="margin-left: auto" />
     </div>
     <div class="icon-and-date-container">
       <img
@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
 import axios from "axios";
-import { BiSearch, BiX } from "vue3-icons/bi";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/solid";
 import { useWeatherStore } from "../store/weather";
 import { returnImage, imageCodes } from "@/helpers/index";
 
@@ -122,7 +122,7 @@ onMounted(async () => {
   column-gap: 1rem;
 }
 .city-input svg {
-  min-width: 2rem;
+  width: 2rem;
 }
 .city-input input {
   background-color: transparent;
@@ -224,12 +224,7 @@ onMounted(async () => {
     height: 20rem;
   }
 }
-@media screen and (min-width: 400px) {
-  .weather-img {
-    width: 25rem;
-    height: 25rem;
-  }
-}
+
 @media screen and (min-width: 600px) {
   .icon-and-date-container {
     display: flex;

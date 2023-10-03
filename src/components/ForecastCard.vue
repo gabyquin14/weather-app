@@ -56,6 +56,7 @@ const returnWeekday = () => {
 }
 .forecast-weather {
   font-weight: 400;
+  font-size: 1.6rem;
   text-transform: capitalize;
 }
 .forecast-img {

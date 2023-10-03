@@ -6,7 +6,7 @@
         {{ returnWindSpeed() }}<span>{{ metrics ? "km/h" : "mi/h" }}</span>
       </h1>
       <div class="bottom-description">
-        <span class="wind-icon-container"><FaMapMarkerAlt /></span>
+        <span class="wind-icon-container"><MapPinIcon /></span>
         <span class="description">{{ degToCompass() }}</span>
       </div>
     </HighlightCard>
@@ -25,7 +25,7 @@
         <div class="sun-content">
           <div class="outer-circle flex-center">
             <div class="inner-circle flex-center">
-              <AiOutlineArrowUp />
+              <ArrowUpIcon />
             </div>
           </div>
           <h1>{{ returnDate("sunrise") }}</h1>
@@ -33,7 +33,7 @@
         <div class="sun-content">
           <div class="outer-circle flex-center">
             <div class="inner-circle flex-center">
-              <AiOutlineArrowDown />
+              <ArrowDownIcon />
             </div>
           </div>
           <h1>{{ returnDate("sunset") }}</h1>
@@ -73,8 +73,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import HighlightCard from "./HighlightCard.vue";
-import { FaMapMarkerAlt } from "vue3-icons/fa";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "vue3-icons/ai";
+import {
+  MapPinIcon,
+  ArrowDownIcon,
+  ArrowUpIcon,
+} from "@heroicons/vue/24/solid";
 import { useWeatherStore } from "../store/weather";
 import { CityType } from "@/store/type";
 
@@ -242,7 +245,10 @@ const visibilityCaption = () => {
 }
 .wind-icon-container svg {
   color: var(--accent);
-  font-size: 1.8rem;
+  width: 1.8rem;
   transform: rotate(22deg);
+}
+svg {
+  width: 1.8rem;
 }
 </style>
